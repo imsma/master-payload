@@ -8,17 +8,10 @@ type AccessArgs = {
 
 const Posts: CollectionConfig = {
   slug: 'posts',
-  auth: {
-    tokenExpiration: 7200, // How many seconds to keep the user logged in
-    verify: true, // Require email verification before being allowed to authenticate
-    maxLoginAttempts: 5, // Automatically lock a user out after X amount of failed logins
-    lockTime: 600 * 1000, // Time period to allow the max login attempts
-    // More options are available
-  },
   access: {
     read: () => true, // Public read access
     create: ({ req: { user } }: AccessArgs) => {
-      return user?.role === 'admin'
+      return user?.role === 'admin' || user?.role === 'editor'
     },
     update: ({ req: { user } }: AccessArgs) => {
       return user?.role === 'admin' || user?.role === 'editor'
@@ -41,7 +34,8 @@ const Posts: CollectionConfig = {
     {
       name: 'author',
       type: 'relationship',
-      relationTo: 'users',
+      relationTo: 'authors',
+      required: true,
     },
     {
       name: 'publishedDate',
