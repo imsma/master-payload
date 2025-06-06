@@ -64,6 +64,7 @@ export type SupportedTimezones =
 export interface Config {
   auth: {
     users: UserAuthOperations;
+    posts: PostAuthOperations;
   };
   blocks: {};
   collections: {
@@ -93,9 +94,13 @@ export interface Config {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
   };
   locale: null;
-  user: User & {
-    collection: 'users';
-  };
+  user:
+    | (User & {
+        collection: 'users';
+      })
+    | (Post & {
+        collection: 'posts';
+      });
   jobs: {
     tasks: unknown;
     workflows: unknown;
@@ -119,12 +124,31 @@ export interface UserAuthOperations {
     password: string;
   };
 }
+export interface PostAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
+  };
+}
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
   id: number;
+  role: 'admin' | 'editor';
   updatedAt: string;
   createdAt: string;
   enableAPIKey?: boolean | null;
@@ -191,6 +215,16 @@ export interface Post {
     | null;
   updatedAt: string;
   createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  _verified?: boolean | null;
+  _verificationToken?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  password?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -212,10 +246,15 @@ export interface PayloadLockedDocument {
         value: number | Post;
       } | null);
   globalSlug?: string | null;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'posts';
+        value: number | Post;
+      };
   updatedAt: string;
   createdAt: string;
 }
@@ -225,10 +264,15 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: number;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'posts';
+        value: number | Post;
+      };
   key?: string | null;
   value?:
     | {
@@ -258,6 +302,7 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
   enableAPIKey?: T;
@@ -307,6 +352,15 @@ export interface PostsSelect<T extends boolean = true> {
       };
   updatedAt?: T;
   createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  _verified?: T;
+  _verificationToken?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
