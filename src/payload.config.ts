@@ -23,6 +23,7 @@ export default buildConfig({
     },
     components: {
       beforeDashboard: ['/components/HelloWidget.tsx'],
+      actions: ['/components/ExportButton.tsx'],
     },
   },
   collections,

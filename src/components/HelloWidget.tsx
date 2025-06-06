@@ -1,8 +1,9 @@
 import React from 'react'
+import '../styles/hello-widget.css'
 
 const HelloWidget: React.FC = () => {
   return (
-    <div style={{ fontSize: '3rem' }} className="my-component">
+    <div className="hello-widget">
       Hello, bySMA 📣
       <hr />
     </div>
