@@ -57,6 +57,24 @@ const Posts: CollectionConfig = {
         },
       ],
     },
+    {
+      name: 'status',
+      type: 'select',
+      options: [
+        {
+          label: 'Draft',
+          value: 'draft',
+        },
+        {
+          label: 'Published',
+          value: 'published',
+        },
+        {
+          label: 'Archived',
+          value: 'archived',
+        },
+      ],
+    },
   ],
   hooks: {
     beforeChange: [
