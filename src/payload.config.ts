@@ -9,6 +9,8 @@ import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import Posts from './collections/Posts'
+import { collections } from './collections'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -20,7 +22,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media],
+  collections,
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
@@ -32,6 +34,73 @@ export default buildConfig({
     },
   }),
   sharp,
+  globals: [
+    {
+      slug: 'site-settings',
+      fields: [
+        {
+          name: 'siteTitle',
+          type: 'text',
+          required: true,
+        },
+        {
+          name: 'siteDescription',
+          type: 'textarea',
+        },
+        {
+          name: 'contactEmail',
+          type: 'email',
+          required: true,
+        },
+        {
+          name: 'socialMediaLinks',
+          type: 'array',
+          fields: [
+            {
+              name: 'platform',
+              type: 'text',
+              required: true,
+            },
+            {
+              name: 'url',
+              type: 'text',
+              required: true,
+            },
+          ],
+        },
+        {
+          name: 'maintenanceMode',
+          type: 'checkbox',
+          label: 'Enable Maintenance Mode',
+          defaultValue: false,
+        },
+        {
+          name: 'defaultLanguage',
+          type: 'select',
+          options: [
+            { label: 'English', value: 'en' },
+            { label: 'Spanish', value: 'es' },
+            { label: 'French', value: 'fr' },
+          ],
+          defaultValue: 'en',
+        },
+        {
+          name: 'themeSettings',
+          type: 'group',
+          fields: [
+            {
+              name: 'primaryColor',
+              type: 'text',
+            },
+            {
+              name: 'fontFamily',
+              type: 'text',
+            },
+          ],
+        },
+      ],
+    },
+  ],
   plugins: [
     payloadCloudPlugin(),
     // storage-adapter-placeholder
