@@ -1,7 +1,18 @@
 // storage-adapter-import-placeholder
 import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import { payloadCloudPlugin } from '@payloadcms/payload-cloud'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import {
+  BoldFeature,
+  HeadingFeature,
+  HorizontalRuleFeature,
+  InlineToolbarFeature,
+  ItalicFeature,
+  lexicalEditor,
+  LinkFeature,
+  ParagraphFeature,
+  UnderlineFeature,
+  UploadFeature,
+} from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
@@ -11,6 +22,8 @@ import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import Posts from './collections/Posts'
 import { collections } from './collections'
+import { Upload } from '@payloadcms/ui'
+import { searchPlugin } from '@payloadcms/plugin-search'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -27,7 +40,35 @@ export default buildConfig({
     },
   },
   collections,
-  editor: lexicalEditor(),
+  editor: lexicalEditor({
+    features: () => {
+      return [
+        ParagraphFeature(),
+        UnderlineFeature(),
+        BoldFeature(),
+        ItalicFeature(),
+        HorizontalRuleFeature(),
+        InlineToolbarFeature(),
+        HeadingFeature(),
+        UploadFeature({
+          collections: {
+            media: {
+              fields: [
+                {
+                  name: 'altText',
+                  type: 'text',
+                  label: 'Alt Text',
+                },
+              ],
+            },
+          },
+        }),
+        LinkFeature({
+          enabledCollections: ['posts'],
+        }),
+      ]
+    },
+  }),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
@@ -107,6 +148,12 @@ export default buildConfig({
   ],
   plugins: [
     payloadCloudPlugin(),
+    searchPlugin({
+      collections: ['posts'],
+      defaultPriorities: {
+        posts: 20,
+      },
+    }),
     // storage-adapter-placeholder
   ],
 })
